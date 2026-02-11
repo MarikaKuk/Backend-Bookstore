@@ -2,6 +2,7 @@ package backend.bookstore.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,15 +10,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import backend.bookstore.domain.Book;
 import backend.bookstore.domain.BookRepository;
+import backend.bookstore.domain.CategoryRepository;
+import jakarta.validation.Valid;
 
 @Controller
 
 public class BookController {
 
     private final BookRepository bookRepository;
+    private final CategoryRepository categoryRepository;
 
-    public BookController(BookRepository bookRepository) {
+    public BookController(BookRepository bookRepository,
+            CategoryRepository categoryRepository) {
         this.bookRepository = bookRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @GetMapping("/booklist")
@@ -29,11 +35,17 @@ public class BookController {
     @RequestMapping("/add")
     public String addBook(Model model) {
         model.addAttribute("book", new Book());
+        model.addAttribute("categories", categoryRepository.findAll());
         return "addbook";
     }
 
     @PostMapping("/save")
-    public String saveBook(Book book) {
+    public String saveBook(@Valid Book book, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("book", book);
+            model.addAttribute("categories", categoryRepository.findAll());
+            return "addbook";
+        }
         bookRepository.save(book);
         return "redirect:booklist";
     }
@@ -47,6 +59,7 @@ public class BookController {
     @GetMapping("/edit/{id}")
     public String editBook(@PathVariable("id") Long id, Model model) {
         model.addAttribute("book", bookRepository.findById(id));
+        model.addAttribute("categories", categoryRepository.findAll());
         return "editbook";
     }
 
