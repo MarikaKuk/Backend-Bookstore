@@ -1,14 +1,20 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
 
 <head>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
     <title>Booklist</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 
 <body>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out" />
+        <h3>User: <span sec:authentication="name"></span></h3>
+    </form>
     <h1>Books</h1>
-    <table>
+    <table class="table table-stiped">
         <tr>
             <th>Author</th>
             <th>Title</th>
@@ -23,11 +29,13 @@
             <td th:text="${book.publicationYear}"></td>
             <td th:text="${book.category.name}"></td>
 
-            <td><a th:href="@{/delete/{id}(id=${book.id})}">Delete</a></td>
-            <td><a th:href="@{/edit/{id}(id=${book.id})}">Edit</a></td>
+            <td sec:authorize="hasAuthority('ADMIN')"><a th:href="@{/delete/{id}(id=${book.id})}"><button type="submit"
+                        class="btn btn-danger">Delete</button></a></td>
+            <td sec:authorize="hasAuthority('ADMIN')"><a th:href="@{/edit/{id}(id=${book.id})}"><button type="submit"
+                        class="btn btn-warning">Edit</button></a></td>
         </tr>
     </table>
-    <a href="/add">Add Book</a>
+    <a href="/add"><button type="submit" class="btn btn-success">Add Book</button></a>
 </body>
 
 </html>

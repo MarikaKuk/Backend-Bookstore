@@ -7,6 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import backend.bookstore.domain.AppUser;
+import backend.bookstore.domain.AppUserRepository;
 import backend.bookstore.domain.Book;
 import backend.bookstore.domain.BookRepository;
 import backend.bookstore.domain.Category;
@@ -22,9 +24,19 @@ public class BookstoreApplication {
 	}
 
 	@Bean
-	public CommandLineRunner bookDemo(BookRepository bookRepository, CategoryRepository categoryRepository) {
+	public CommandLineRunner bookDemo(BookRepository bookRepository, CategoryRepository categoryRepository,
+			AppUserRepository userRepository) {
 		return (args) -> {
-			log.info("save a couple of books");
+
+			log.info("Create some users");
+			// Create users: admin/admin user/user
+			AppUser user1 = new AppUser("user", "$2a$10$9rkoHTg3Wzuv7bNMc2eVdOilaWM5diAjQcxDhXBubcZEucwDSEga2", "USER");
+			AppUser user2 = new AppUser("admin", "$2a$10$/S8xfinphAvfJCxeeBJw4.Vro3Lb2pQTlU4swln2jp52Xd/1z65nW",
+					"ADMIN");
+			userRepository.save(user1);
+			userRepository.save(user2);
+
+			log.info("save a couple of categories");
 
 			Category category1 = new Category("Horror");
 			Category category2 = new Category("Romantic");
@@ -33,6 +45,8 @@ public class BookstoreApplication {
 			categoryRepository.save(category1);
 			categoryRepository.save(category2);
 			categoryRepository.save(category3);
+
+			log.info("save a couple of books");
 
 			bookRepository.save(new Book("Kasvoton kuolema", "Henning Mankell", "123456-22", 45.60, 1995, category1));
 			bookRepository
